@@ -107,6 +107,38 @@ function deserialize_system(sys_path, run_on_eagle::Bool=false)
     return sys
 end
 
+# This function fixes the order of the staticinjection objects in the adding forecasts functions
+# for the 5 bus system; the other scripts in this repo for the 5 bus system move components around
+# within the system, and this changes their order when adding the forecasts error and creates different
+# forecasts between system configurations (even for the same devices); this ensures that the same
+# devices have the same forecasts, even when they are moved around
+function get_static_injectors(sys_da)
+    if length(collect(get_components(RenewableDispatch, sys_da))) == 3
+        rds = ["Wind", "Wind2", "SolarPV1"]
+    else
+        rds = ["Wind", "SolarPV1", "SolarPV2", "SolarPV3"]
+    end
+
+    comps = StaticInjection[]
+
+    for i in ["node_b", "node_c", "node_d"]
+        push!(comps, get_component(PowerLoad, sys_da, i))
+    end
+    for i in rds
+        push!(comps, get_component(RenewableDispatch, sys_da, i))
+    end
+    for i in get_components(ThermalStandard, sys_da)
+        push!(comps, i)
+    end
+    for i in get_components(GenericBattery, sys_da)
+        push!(comps, i)
+    end
+    for i in get_components(BatteryEMS, sys_da)
+        push!(comps, i)
+    end
+    return comps
+end
+
 function convert_must_run_units!(sys)
     for d in get_components(x -> x.fuel == PSY.ThermalFuels.NUCLEAR, ThermalGen, sys)
         convert_component!(ThermalMultiStart, d, sys)
@@ -144,7 +176,12 @@ end
 
     
 function add_forecast_error!(da_sys, error_mean)
-    components = vcat(collect(get_components(Service, da_sys)), collect(get_components(StaticInjection, da_sys)))
+    if length(collect(get_components(Bus, da_sys))) == 5
+        components = vcat(collect(get_components(Service, da_sys)), get_static_injectors(da_sys))
+    else
+        components = vcat(collect(get_components(Service, da_sys)), collect(get_components(StaticInjection, da_sys)))
+    end
+
     distribution = Normal(error_mean, 0.05)
     for d in components
         if isa(d, HybridSystem)
@@ -168,7 +205,11 @@ function add_single_time_series_forecast_error!(
     add_forecast_error!(da_sys, error_mean)
     remove_time_series!(da_sys, Deterministic)
     remove_time_series!(da_sys, DeterministicSingleTimeSeries)
-    components = vcat(collect(get_components(Service, da_sys)), collect(get_components(StaticInjection, da_sys)))
+    if length(collect(get_components(Bus, da_sys))) == 5
+        components = vcat(collect(get_components(Service, da_sys)), get_static_injectors(da_sys))
+    else
+        components = vcat(collect(get_components(Service, da_sys)), collect(get_components(StaticInjection, da_sys)))
+    end
     for device in components
         for ts_name in get_time_series_names(SingleTimeSeries, device)
             if isa(device, HybridSystem)
