@@ -53,9 +53,7 @@ ldes = collect(get_components(GenericBattery, sys_UC))
 #=
 ldes = first(get_components(GenericBattery, sys_UC)) #(there is only one LDES in RTS system
 new_bus = get_component(Bus, sys_UC, "Chifa")
-remove_component!(sys_UC, ldes)
 ldes.bus = new_bus
-add_component!(sys_UC, ldes)
 =#
 
 

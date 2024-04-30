@@ -47,19 +47,15 @@ template_uc = get_template_uc(network_formulation, "StorageDispatch")
 function run_new_simulation(sim_name, bus, vre_bus)
     sys_UC = System(sys_name)
 
-    set_units_base_system!(sys_UC, PSY.UnitSystem.SYSTEM_BASE)
 
     # Move LDES
     ldes = get_component(GenericBattery, sys_UC, "5bus_60_long_duration")
-    remove_component!(sys_UC, ldes)
     
     new_bus = get_component(Bus, sys_UC, bus)
 
     new_bus_num = new_bus.number
     ldes.bus = new_bus
     ldes.name = "LDES_bus$new_bus_num"
-
-    add_component!(sys_UC, ldes)
 
     # Move Renewables; note that the user will have to adapt this code for the PV system
     wind = get_component(RenewableDispatch, sys_UC, "Wind")
@@ -79,17 +75,9 @@ function run_new_simulation(sim_name, bus, vre_bus)
     remove_time_series!(sys_UC, SingleTimeSeries, wind2, "max_active_power")
     remove_time_series!(sys_UC, SingleTimeSeries, pv, "max_active_power")
 
-    remove_component!(sys_UC, wind)
-    remove_component!(sys_UC, wind2)
-    remove_component!(sys_UC, pv)
-
     wind.bus = new_vre_bus
     wind2.bus = new_vre_bus
     pv.bus = new_vre_bus
-
-    add_component!(sys_UC, wind)
-    add_component!(sys_UC, wind2)
-    add_component!(sys_UC, pv)
 
     add_time_series!(sys_UC, wind, wind_ts)
     add_time_series!(sys_UC, wind2, wind2_ts)
@@ -98,6 +86,8 @@ function run_new_simulation(sim_name, bus, vre_bus)
     println("VRE MOVED")
     flush(stdout)
     
+    set_units_base_system!(sys_UC, PSY.UnitSystem.SYSTEM_BASE)
+
     # Add forecast errors for simulations
     Random.seed!(10)
     add_single_time_series_forecast_error!(sys_UC, horizon, Hour(interval), 0.05)

@@ -48,11 +48,8 @@ template_uc = get_template_uc(network_formulation, "StorageDispatch")
 function run_new_simulation(sim_name, bus, bus_SDES)
     sys_UC = System(sys_name)
 
-    set_units_base_system!(sys_UC, PSY.UnitSystem.SYSTEM_BASE)
-
     # Move LDES
     ldes = get_component(GenericBattery, sys_UC, "5bus_60_long_duration")
-    remove_component!(sys_UC, ldes)
     
     new_bus = get_component(Bus, sys_UC, bus)
 
@@ -60,19 +57,16 @@ function run_new_simulation(sim_name, bus, bus_SDES)
     ldes.bus = new_bus
     ldes.name = "LDES_bus$new_bus_num"
 
-    add_component!(sys_UC, ldes)
-
     # Move SDES
     new_bus_SDES = get_component(Bus, sys_UC, bus_SDES)
     new_bus_SDES_num = new_bus_SDES.number
 
     SDES_comp = get_component(BatteryEMS, sys_UC, "5bus_60_short_duration")
-    remove_component!(sys_UC, SDES_comp)
 
     SDES_comp.bus = new_bus_SDES
     SDES_comp.name = "SDES_bus$(new_bus_SDES_num)"
 
-    add_component!(sys_UC, SDES_comp)
+    set_units_base_system!(sys_UC, PSY.UnitSystem.SYSTEM_BASE)
 
     # Add forecast errors for simulations
     Random.seed!(10)

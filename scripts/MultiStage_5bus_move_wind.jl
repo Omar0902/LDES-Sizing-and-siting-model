@@ -52,19 +52,14 @@ PV_rd_dict = Dict("node_a" => ["SolarPV3"], "node_b" => String[], "node_c" => ["
 function run_new_simulation(sim_name, bus, vre_bus)
     sys_UC = System(sys_name)
 
-    set_units_base_system!(sys_UC, PSY.UnitSystem.SYSTEM_BASE)
-
     # Move LDES
     ldes = get_component(GenericBattery, sys_UC, "5bus_60_long_duration")
-    remove_component!(sys_UC, ldes)
     
     new_bus = get_component(Bus, sys_UC, bus)
 
     new_bus_num = new_bus.number
     ldes.bus = new_bus
     ldes.name = "LDES_bus$new_bus_num"
-
-    add_component!(sys_UC, ldes)
 
     # Get wind generator from bus 5
     wind = get_component(RenewableDispatch, sys_UC, "Wind")
@@ -82,32 +77,23 @@ function run_new_simulation(sim_name, bus, vre_bus)
         remove_time_series!(sys_UC, SingleTimeSeries, wind, "max_active_power")
         remove_time_series!(sys_UC, SingleTimeSeries, vre_to_switch, "max_active_power")
 
-        remove_component!(sys_UC, wind)
-        remove_component!(sys_UC, vre_to_switch)
-
         new_vre_bus = get_component(Bus, sys_UC, vre_bus)
         bus5 = get_component(Bus, sys_UC, "node_e")
 
         wind.bus = new_vre_bus
         vre_to_switch.bus = bus5
 
-        add_component!(sys_UC, wind)
-        add_component!(sys_UC, vre_to_switch)
-
         add_time_series!(sys_UC, wind, wind_ts)
         add_time_series!(sys_UC, vre_to_switch, ts_switch)
-
     else
         new_vre_bus = get_component(Bus, sys_UC, vre_bus)
 
-        remove_component!(sys_UC, wind)
         wind.bus = new_vre_bus
-
-        add_component!(sys_UC, wind)
-        add_time_series!(sys_UC, wind, wind_ts)
     end
     println("VRE MOVED")
     flush(stdout)
+
+    set_units_base_system!(sys_UC, PSY.UnitSystem.SYSTEM_BASE)
     
     # Add forecast errors for simulations
     Random.seed!(10)

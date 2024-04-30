@@ -50,20 +50,16 @@ function run_new_simulation(sim_name, bus, ts_restriction)
 
     # Reduce the thermal generation capacity for generator on bus 3
     ts = get_component(ThermalStandard, sys_UC, "Solitude")
-    remove_component!(sys_UC, ts)
     ts.active_power_limits = (min = ts.active_power_limits.min, max = ts_restriction)
     ts.reactive_power_limits = (min = ts.reactive_power_limits.min, max = ts_restriction)
-    add_component!(sys_UC, ts)
 
     # Uncomment the lines below (and comment the lines above) to apply the restriction to all generators
     #=
     ts = collect(get_components(ThermalStandard, sys_UC))
 
     for i in 1:length(ts)
-        remove_component!(sys_UC, ts[i])
         ts[i].active_power_limits = (min = ts[i].active_power_limits.min, max = ts_restriction)
         ts[i].reactive_power_limits = (min = ts[i].reactive_power_limits.min, max = ts_restriction)
-        add_component!(sys_UC, ts[i])
     end
     =#
 
@@ -72,15 +68,12 @@ function run_new_simulation(sim_name, bus, ts_restriction)
 
     # Move LDES
     ldes = get_component(GenericBattery, sys_UC, "5bus_60_long_duration")
-    remove_component!(sys_UC, ldes)
     
     new_bus = get_component(Bus, sys_UC, bus)
 
     new_bus_num = new_bus.number
     ldes.bus = new_bus
     ldes.name = "LDES_bus$new_bus_num"
-
-    add_component!(sys_UC, ldes)
 
     # Add forecast errors for simulations
     Random.seed!(10)

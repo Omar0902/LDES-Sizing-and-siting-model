@@ -47,19 +47,14 @@ template_uc = get_template_uc(network_formulation, "StorageDispatch")
 function run_new_simulation(sim_name, bus, tf)
     sys_UC = System(sys_name)
 
-    set_units_base_system!(sys_UC, PSY.UnitSystem.SYSTEM_BASE)
-
     # Move LDES
     ldes = get_component(GenericBattery, sys_UC, "5bus_60_long_duration")
-    remove_component!(sys_UC, ldes)
     
     new_bus = get_component(Bus, sys_UC, bus)
 
     new_bus_num = new_bus.number
     ldes.bus = new_bus
     ldes.name = "LDES_bus$new_bus_num"
-
-    add_component!(sys_UC, ldes)
 
     # Reduce line capacities by tf
     lines = collect(get_components(Line, sys_UC))
@@ -68,6 +63,7 @@ function run_new_simulation(sim_name, bus, tf)
         line.rate *= tf
     end
 
+    set_units_base_system!(sys_UC, PSY.UnitSystem.SYSTEM_BASE)
 
     # Add forecast errors for simulations
     Random.seed!(10)
