@@ -135,7 +135,6 @@ function run_new_simulation(sim_name, bus, load_bus)
     end
 
     exec_time = @elapsed execute!(sim, enable_progress_bar=true, cache_size_mib = 512, min_cache_flush_size_mib = 100)
-
     
     results = SimulationResults(sim);
     results_uc = get_decision_problem_results(results, "UC");
