@@ -19,16 +19,16 @@ using Xpress
 using Random
 
 Random.seed!(10)
-include(joinpath(pwd(), "simulation_scripts/simulation_utils.jl"))
+include((@__DIR)*"/simulation_utils.jl")
 
 ### Parsing Args
-sys_name = (@__DIR__)*"/../systems_data/dataset_60p_system/5bus_system_Wind.json"
+sys_name = (@__DIR__)*"/../systems_data/5bus_system_Wind_caseB.json"
 
 interval = 24 # simulation step interval in Hours
 num_periods = 1
 horizon = 15*24 # total time periods in hours, including the day-ahead time
 steps = 350 # number of steps in the simulation
-battery = true 
+battery = true
 form = "StorageDispatch"
 network_formulation = "StandardPTDFModel"
 output_dir = (@__DIR__)*"/5bus_sims/move_aggVRE"
@@ -50,7 +50,7 @@ function run_new_simulation(sim_name, bus, vre_bus)
 
     # Move LDES
     ldes = get_component(GenericBattery, sys_UC, "5bus_60_long_duration")
-    
+
     new_bus = get_component(Bus, sys_UC, bus)
 
     new_bus_num = new_bus.number
@@ -85,7 +85,7 @@ function run_new_simulation(sim_name, bus, vre_bus)
 
     println("VRE MOVED")
     flush(stdout)
-    
+
     set_units_base_system!(sys_UC, PSY.UnitSystem.SYSTEM_BASE)
 
     # Add forecast errors for simulations
@@ -132,7 +132,7 @@ function run_new_simulation(sim_name, bus, vre_bus)
     flush(stdout)
 
     exec_time = @elapsed execute!(sim, enable_progress_bar=true, cache_size_mib = 512, min_cache_flush_size_mib = 100)
-    
+
     results = SimulationResults(sim);
     results_uc = get_decision_problem_results(results, "UC");
     export_results_csv(results_uc, "UC", joinpath(results.path, "results"))

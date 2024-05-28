@@ -14,7 +14,6 @@ using Random, Distributions
 using TimeSeries
 using DataStructures
 
-include(joinpath(pwd(), "simulation_scripts/custom_decision_model.jl"))
 # Mapping command line arg to network formulation
 get_day_ahead_timestamps(sim_year) = collect(DateTime("$(sim_year)-01-01T00:00:00"):Hour(1):DateTime("$(sim_year)-12-31T23:00:00"))
 
@@ -83,6 +82,13 @@ function get_template_uc(network_formulation, battery_form, add_ldes=true)
     return template_uc
 end
 
+
+function save_to_csv(cont, model_name, save_dir=".")
+    for (name, df) in cont
+        CSV.write(joinpath(save_dir, "$(name)_$(model_name).csv"), df)
+    end
+end
+
 function export_results_csv(results, stage, path)
     variables = PSI.read_realized_variables(results)
     aux_variables = PSI.read_realized_aux_variables(results)
@@ -139,6 +145,49 @@ function get_static_injectors(sys_da)
     return comps
 end
 
+function PSY.convert_component!(
+    thtype::Type{<:PSY.ThermalGen},
+    th::ThermalStandard,
+    sys::System;
+    kwargs...
+)
+
+    new_th = thtype(;
+        name=th.name,
+        available=th.available,
+        status=th.status,
+        bus=th.bus,
+        active_power=th.active_power,
+        reactive_power=th.reactive_power,
+        rating=th.rating,
+        prime_mover=th.prime_mover,
+        fuel=th.fuel,
+        active_power_limits=th.active_power_limits,
+        reactive_power_limits=th.reactive_power_limits,
+        ramp_limits=th.ramp_limits,
+        time_limits=th.time_limits,
+        operation_cost=th.operation_cost,
+        base_power=th.base_power,
+        power_trajectory=nothing,
+        start_time_limits=nothing,
+        start_types=1,
+        services=Device[],
+        must_run=true,
+        time_at_status=th.time_at_status,
+        dynamic_injector=th.dynamic_injector,
+        ext=Dict{String,Any}(),
+        time_series_container=InfrastructureSystems.TimeSeriesContainer(),
+    )
+    IS.assign_new_uuid!(new_th)
+    add_component!(sys, new_th)
+    copy_time_series!(new_th, th)
+    for service in get_services(th)
+        add_service!(new_th, service, sys)
+    end
+    remove_component!(sys, th)
+    return
+end
+
 function convert_must_run_units!(sys)
     for d in get_components(x -> x.fuel == PSY.ThermalFuels.NUCLEAR, ThermalGen, sys)
         convert_component!(ThermalMultiStart, d, sys)
@@ -165,16 +214,16 @@ function add_forecast_error(sys, device, time_series_name, distribution)
     ts_data = get_time_series_values(SingleTimeSeries, device, time_series_name; ignore_scaling_factors=true)
 
     interval = Int(Dates.value(Hour(PSY.get_forecast_interval(sys))))
-    horizon = Int(get_horizon(ts)) 
+    horizon = Int(get_horizon(ts))
     for (i, init_time) in enumerate(PSY.get_forecast_initial_times(sys))
         _data = vcat(ts_data[(i-1)*interval+1 : interval*i], ts_data[(i*interval)+1 : (i-1)*interval+horizon] .+ rand(distribution, horizon - interval))
         data[init_time] = map(x -> x < 0.0 ? 0.0 : x,  _data)
     end
     device.ext[time_series_name] = data
-    return 
+    return
 end
 
-    
+
 function add_forecast_error!(da_sys, error_mean)
     if length(collect(get_components(Bus, da_sys))) == 5
         components = vcat(collect(get_components(Service, da_sys)), get_static_injectors(da_sys))
@@ -191,7 +240,7 @@ function add_forecast_error!(da_sys, error_mean)
             add_forecast_error(da_sys, d, ts_name, distribution)
         end
     end
-    return 
+    return
 end
 
 function add_single_time_series_forecast_error!(
@@ -238,7 +287,7 @@ function add_single_time_series_forecast_error!(
                 )
                 add_time_series!(da_sys, device, ts_data)
                 device.ext[ts_name] = nothing
-            else            
+            else
                 ts_data = PSY.Deterministic(
                     name = ts_name,
                     data = device.ext[ts_name],
@@ -274,5 +323,3 @@ function _build_battery(::Type{T}, bus::PSY.Bus, name::String, energy_capacity, 
     )
     return device
 end
-
-

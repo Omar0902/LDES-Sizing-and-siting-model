@@ -23,17 +23,18 @@ include((@__DIR)*"/simulation_utils.jl")
 
 sim_name = "RTS_PV"
 
-sys_name = (@__DIR__)*"/../systems_data/dataset_60p_system/RTS_system_PV.json"
+sys_name = (@__DIR__)*"/../systems_data/RTS_system_PV_caseA.json"
 
 interval = 24
 num_periods = 1
 horizon = 4 * 24
 steps = 350
-battery = true 
+battery = true
 form = "StorageDispatch"
 network_formulation = "StandardPTDFModel"
 output_dir = (@__DIR__)*"/RTS_sims"
 
+# Change solver if needed
 solver = optimizer_with_attributes(
     Xpress.Optimizer, "MIPRELSTOP" => 1e-5, "OUTPUTLOG" => 0, "MAXTIME" => 2000, "THREADS" => Threads.nthreads()
 )
@@ -45,7 +46,7 @@ end
 
 template_uc = get_template_uc(network_formulation, "StorageDispatch")
 
-sys_UC = PSY.System(sys_name); 
+sys_UC = PSY.System(sys_name);
 
 ldes = collect(get_components(GenericBattery, sys_UC))
 
