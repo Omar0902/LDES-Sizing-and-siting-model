@@ -36,8 +36,6 @@ solver = optimizer_with_attributes(
     Xpress.Optimizer, "MIPRELSTOP" => 1e-5, "OUTPUTLOG" => 0, "MAXTIME" => 1000, "THREADS" => 208
 )
 
-solver = HiGHS.Optimizer
-
 if !ispath(output_dir)
     mkpath(output_dir)
 end
