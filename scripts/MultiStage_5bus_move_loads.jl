@@ -15,7 +15,6 @@ const IS = InfrastructureSystems
 using TimeSeries
 using JuMP
 using HiGHS
-using Xpress
 using Random
 
 Random.seed!(10)
@@ -37,6 +36,8 @@ solver = optimizer_with_attributes(
     Xpress.Optimizer, "MIPRELSTOP" => 1e-5, "OUTPUTLOG" => 0, "MAXTIME" => 1000, "THREADS" => 208
 )
 
+solver = HiGHS.Optimizer
+
 if !ispath(output_dir)
     mkpath(output_dir)
 end
@@ -51,17 +52,14 @@ function run_new_simulation(sim_name, bus, load_bus)
 
     # Move LDES
     ldes = get_component(GenericBattery, sys_UC, "5bus_60_long_duration")
-    remove_component!(sys_UC, ldes)
 
     new_bus = get_component(Bus, sys_UC, bus)
 
     new_bus_num = new_bus.number
+
     ldes.bus = new_bus
+
     ldes.name = "LDES_bus$new_bus_num"
-
-    add_component!(sys_UC, ldes)
-
-
 
     loadd = get_component(PowerLoad, sys_UC, "node_d")
     tsd = get_time_series(SingleTimeSeries, loadd, "max_active_power")
@@ -87,10 +85,8 @@ function run_new_simulation(sim_name, bus, load_bus)
         new_bus = get_component(Bus, sys_UC, load_bus)
         new_bus_num = new_bus.number
 
-        remove_component!(sys_UC, loadd)
         loadd.bus = new_bus
         loadd.name = load_bus
-        add_component!(sys_UC, loadd)
         add_time_series!(sys_UC, loadd, tsd)
     end
 
