@@ -19,7 +19,7 @@ using Xpress
 using Random
 
 Random.seed!(10)
-include((@__DIR)*"/simulation_utils.jl")
+include((@__DIR__)*"/simulation_utils.jl")
 
 ### Parsing Args
 sys_name = (@__DIR__)*"/../systems_data/5bus_system_Wind_caseB.json"
@@ -31,7 +31,7 @@ steps = 350 # number of steps in the simulation
 battery = true
 form = "StorageDispatch"
 network_formulation = "StandardPTDFModel"
-output_dir = (@__DIR__)*"/5bus_sims/move_aggVRE"
+output_dir = (@__DIR__)*"/5bus_sims/reduce_thermal_capacity"
 
 solver = optimizer_with_attributes(
     Xpress.Optimizer, "MIPRELSTOP" => 1e-5, "OUTPUTLOG" => 0, "MAXTIME" => 1000, "THREADS" => 208

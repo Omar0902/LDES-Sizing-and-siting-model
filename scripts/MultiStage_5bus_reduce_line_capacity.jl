@@ -19,7 +19,7 @@ using Xpress
 using Random
 
 Random.seed!(10)
-include((@__DIR)*"/simulation_utils.jl")
+include((@__DIR__)*"/simulation_utils.jl")
 
 ### Parsing Args
 sys_name = (@__DIR__)*"/../systems_data/5bus_system_Wind_caseB.json"
@@ -115,7 +115,7 @@ end
 
 buses = ["node_a", "node_b", "node_c", "node_d", "node_e"]
 
-tfs = [1.0, 0.95, 0.9, 0.85]
+tfs = [1.0, 0.9, 0.9, 0.8, 0.8, 0.7, 0.6]
 
 for tf in tfs
     for (i, ldes_bus) in enumerate(buses)

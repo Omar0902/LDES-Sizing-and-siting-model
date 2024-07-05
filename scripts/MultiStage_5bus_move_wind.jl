@@ -19,7 +19,7 @@ using Xpress
 using Random
 
 Random.seed!(10)
-include((@__DIR)*"/simulation_utils.jl")
+include((@__DIR__)*"/simulation_utils.jl")
 
 ### Parsing Args
 sys_name = (@__DIR__)*"/../systems_data/5bus_system_Wind_caseB.json"

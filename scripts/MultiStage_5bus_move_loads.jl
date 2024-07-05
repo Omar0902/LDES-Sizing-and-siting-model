@@ -18,7 +18,7 @@ using HiGHS
 using Random
 
 Random.seed!(10)
-include((@__DIR)*"/simulation_utils.jl")
+include((@__DIR__)*"/simulation_utils.jl")
 
 ### Parsing Args
 sys_name = (@__DIR__)*"/../systems_data/5bus_system_Wind_caseB.json"
@@ -32,9 +32,7 @@ form = "StorageDispatch"
 network_formulation = "StandardPTDFModel"
 output_dir = (@__DIR__)*"/5bus_sims/move_loads"
 
-solver = optimizer_with_attributes(
-    Xpress.Optimizer, "MIPRELSTOP" => 1e-5, "OUTPUTLOG" => 0, "MAXTIME" => 1000, "THREADS" => 208
-)
+solver = HiGHS.Optimizer
 
 if !ispath(output_dir)
     mkpath(output_dir)
@@ -65,17 +63,13 @@ function run_new_simulation(sim_name, bus, load_bus)
     # if the bus to move to has a load, swap it with bus four; otherwise, move the
     # load from bus four to that node
     if load_bus in ["node_b", "node_c"]
-        load_to_switch = get_component(PowerLoad, sys_UC, load_bus)
-        ts_switch = get_time_series(SingleTimeSeries, load_to_switch, "max_active_power")
+        bus_for_load = get_component(Bus, sys_UC, load_bus)
+        bus_4 = get_component(Bus, sys_UC, "node_d")
 
-        remove_time_series!(sys_UC, SingleTimeSeries, loadd, "max_active_power")
-        remove_time_series!(sys_UC, SingleTimeSeries, load_to_switch, "max_active_power")
+        load_to_move = get_component(PowerLoad, sys_UC, load_bus)
 
-        loadd.max_active_power = 3.0
-        load_to_switch.max_active_power = 4.0
-
-        add_time_series!(sys_UC, load_to_switch, tsd)
-        add_time_series!(sys_UC, loadd, ts_switch)
+        loadd.bus = bus_for_load
+        load_to_move.bus = bus_4
 
     elseif load_bus == "node_d"
         a = 1
@@ -84,8 +78,6 @@ function run_new_simulation(sim_name, bus, load_bus)
         new_bus_num = new_bus.number
 
         loadd.bus = new_bus
-        loadd.name = load_bus
-        add_time_series!(sys_UC, loadd, tsd)
     end
 
     # Add forecast errors for simulations

@@ -19,7 +19,7 @@ using Xpress
 using Random
 
 Random.seed!(10)
-include((@__DIR)*"/simulation_utils.jl")
+include((@__DIR__)*"/simulation_utils.jl")
 
 sim_name = "RTS_PV"
 
@@ -100,6 +100,7 @@ model = get_simulation_model(sim, :UC)
 if occursin("RTS", sys_name)
     add_must_run_constraint!(model)
 end
+
 exec_time = @elapsed execute!(sim, enable_progress_bar=true, cache_size_mib = 512, min_cache_flush_size_mib = 100)
 
 results = SimulationResults(sim);

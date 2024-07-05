@@ -3,6 +3,37 @@
 This repository contains code and data for performing a siting analysis of long-duration energy storage (LDES) in the 5-bus and RTS systems using the [Sienna suite](https://github.com/NREL-Sienna) developed by the National Renewable Energy Laboratory for production cost modeling (PCM). This analysis involves moving the LDES component to different buses in the system, running a simulation, and considering the production cost of the simulation. Different system configurations are also analyzed with these scripts (such as moving load or renewable dispatch generators to different buses) to observe the impacts the system configuration has on optimal siting. This repository contains three sub directories discussed below. Both the 5-bus and RTS systems have two different initial configurations for the renewable energy components in them, one that is predominantly PV-driven and one that is predominantly wind-driven.
 
 
+| System | Total Load (GWh) | Total VRE (GWh) | Total PV (GWh) | Total Wind (GWh)|
+| ----- | ----- |  ----- |  ----- |  ----- |  
+|5-bus (PV-Driven) | 5,780 | 4,180| 2,460| 1,720|
+|5-bus (Wind-Driven) | 5,780 | 6,040 | 1,640 | 4,400|
+|RTS (PV-Driven) | 37,650 | 32,980 | 23,340 | 9,640 |
+|RTS (WInd-Driven) | 37,650 | 42,880 | 11,400 | 31,480|
+
+| System | # Loads | # PV | # Wind | # Thermal | # Lines | # Tap Transformer
+| ----- | ----- |  ----- |  ----- |  ----- |  ----- | ----- |
+|5-bus (PV-Driven) | 3 | 3 | 1 |2 |6 |0|
+|5-bus (Wind-Driven) | 3 | 1 | 2| 2| 6 | 0|
+|RTS (PV-Driven) | 51 | 58 | 5 | 54 | 105 | 15|
+|RTS (WInd-Driven) | 51 | 29 | 18 | 54 | 105 | 15 |
+
+| SDES | Size (MWh) | Max Charge (MW) | Max Discharge (MW) | Charge Efficiency | Discharge Efficiency | Duration (hr) |
+| ----- | ----- |  ----- |  ----- |  ----- |  ----- | ----- |
+|5-bus (PV-Driven) | 640 | 160 | 160| 0.85 | 1.0 | 3.6 |
+|5-bus (Wind-Driven) | 1,000 | 250 | 250 | 0.85 | 1.0 | 3.6 |
+|RTS (PV-Driven) | 4,000 | 1,000 | 1,000 | 0.85 | 1.0 | 3.6 |
+|RTS (WInd-Driven) | 6,000 | 1,500 | 1,500 | 0.85 | 1.0 | 3.6 |
+
+| LDES | Size (MWh) | Max Charge (MW) | Max Discharge (MW) | Charge Efficiency | Discharge Efficiency | Duration (hr) |
+| ----- | ----- |  ----- |  ----- |  ----- |  ----- | ----- |
+|5-bus (PV-Driven) |5,700 | 380 | 380 | 0.7 | 1.0 | 13.5 | 
+|5-bus (Wind-Driven) | 9,000 | 600 | 600 | 0.7 | 1.0 | 13.5 |
+|RTS (PV-Driven) | 60,000 | 4,000 | 4,000 | 0.7 | 1.0 | 13.5 |
+|RTS (WInd-Driven) | 49,500 | 3,300 | 3,300 | 0.7 | 1.0 | 13.5|
+
+
+Note that these systems also have a lower bound on the state of charge (at 10%) of the storage systems, and this is reflected in the duration. In other words, the duration is equal to 90% of the size divided by the discharge.
+
 ### `systems_data/`
 This directory contains the system data for the 5-bus and RTS systems (both PV- and wind-driven) under the names `5_bus_system_PV.json`, `5_bus_system_Wind_caseB.json`, `RTS_system_PV_caseA.json`, and `RTS_system_Wind_caseB.json`.
 
