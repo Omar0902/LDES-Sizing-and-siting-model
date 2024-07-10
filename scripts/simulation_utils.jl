@@ -83,6 +83,36 @@ function get_template_uc(network_formulation, battery_form, add_ldes=true)
 end
 
 
+function get_template_uc_noduals(network_formulation, battery_form, add_ldes=true)
+    template_uc = ProblemTemplate(
+    NetworkModel(NETWORK_MAP[string(network_formulation)],
+    #duals=DAUL_MAP[string(network_formulation)],
+    use_slacks=true))
+    set_device_model!(template_uc, ThermalStandard, ThermalStandardUnitCommitment)
+    set_device_model!(template_uc, ThermalMultiStart, ThermalBasicUnitCommitment)
+    if add_ldes
+        set_device_model!(template_uc, GenericBattery, BATTERY_MAP[string(battery_form)])
+    end
+    set_device_model!(template_uc, PSY.BatteryEMS, SS.StorageDispatch)
+    set_device_model!(template_uc, PowerLoad, StaticPowerLoad)
+    set_device_model!(template_uc, RenewableDispatch, RenewableFullDispatch)
+    set_device_model!(template_uc, MonitoredLine, StaticBranchBounds)
+    set_device_model!(template_uc, DeviceModel(Line, StaticBranch))#; duals = DUAL_MAP_LINES[string(network_formulation)]))
+    set_device_model!(template_uc, DeviceModel(Transformer2W, StaticBranch))#; duals = DUAL_MAP_LINES[string(network_formulation)]))
+    set_device_model!(template_uc, DeviceModel(TapTransformer, StaticBranch))#; duals = DUAL_MAP_LINES[string(network_formulation)]))
+    set_service_model!(
+        template_uc,
+        ServiceModel(
+            VariableReserve{ReserveUp},
+            RangeReserve,
+            use_slacks=true,
+        )
+    )
+
+    return template_uc
+end
+
+
 function save_to_csv(cont, model_name, save_dir=".")
     for (name, df) in cont
         CSV.write(joinpath(save_dir, "$(name)_$(model_name).csv"), df)
