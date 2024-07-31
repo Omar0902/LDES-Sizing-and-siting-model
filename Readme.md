@@ -3,12 +3,12 @@
 This repository contains code and data for performing a siting analysis of long-duration energy storage (LDES) in the 5-bus and RTS systems using the [Sienna suite](https://github.com/NREL-Sienna) developed by the National Renewable Energy Laboratory for production cost modeling (PCM). This analysis involves moving the LDES component to different buses in the system, running a simulation, and considering the production cost of the simulation. Different system configurations are also analyzed with these scripts (such as moving load or renewable dispatch generators to different buses) to observe the impacts the system configuration has on optimal siting. This repository contains three sub directories discussed below. Both the 5-bus and RTS systems have two different initial configurations for the renewable energy components in them, one that is predominantly PV-driven and one that is predominantly wind-driven.
 
 
-| System | Total Load (GWh) | Total VRE (GWh) | Total PV (GWh) | Total Wind (GWh)|
-| ----- | ----- |  ----- |  ----- |  ----- |  
-|5-bus (PV-Driven) | 5,780 | 4,180| 2,460| 1,720|
-|5-bus (Wind-Driven) | 5,780 | 6,040 | 1,640 | 4,400|
-|RTS (PV-Driven) | 37,650 | 32,980 | 23,340 | 9,640 |
-|RTS (WInd-Driven) | 37,650 | 42,880 | 11,400 | 31,480|
+| System | Total Load (GWh) | Total VRE (GWh) | Total PV (GWh) | Total Wind (GWh)| VRE Cap. (GW) | PV Cap. (GW) | Wind Cap. (GW)|
+| ----- | ----- |  ----- |  ----- |  ----- |  ----- | ----- | ----- |
+|5-bus (PV-Driven) | 5,780 | 4,180| 2,460| 1,720| 1.57 | 1.12 | 0.45 |
+|5-bus (Wind-Driven) | 5,780 | 6,040 | 1,640 | 4,400| 1.90 | 0.75 | 1.15 | 
+|RTS (PV-Driven) | 37,650 | 32,980 | 23,340 | 9,640 | 12.85 | 9.54 | 3.31 |
+|RTS (WInd-Driven) | 37,650 | 42,880 | 11,400 | 31,480| 15.95 | 4.61 | 11. 33 |
 
 | System | # Loads | # PV | # Wind | # Thermal | # Lines | # Tap Transformer
 | ----- | ----- |  ----- |  ----- |  ----- |  ----- | ----- |
