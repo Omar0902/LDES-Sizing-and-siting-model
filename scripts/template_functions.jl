@@ -18,7 +18,7 @@ function abs_flow_variable(data_dict)
 
         fapv_norm_copy = copy(data_dict["fapv_abs"])
         for i in 2:size(fapv_norm_copy, 2)
-            
+
             max_value = maximum(fapv_norm_copy[:, i])
             fapv_norm_copy[:, i] ./= max_value
         end
@@ -103,7 +103,7 @@ function psi_ptdf_lmps(data_dict, sys)
 end
 
 function get_results_dict(path1, path2; key = [], data = [], sys = nothing)
-    
+
     sim_results = SimulationResults(path1, path2)
     uc_results = get_decision_problem_results(sim_results, "UC")
 
@@ -120,7 +120,7 @@ function get_results_dict(path1, path2; key = [], data = [], sys = nothing)
             g = read_realized_variable
         end
 
-        try 
+        try
             data_results = g(uc_results, d)
         catch e
             continue
@@ -193,7 +193,7 @@ Wind_rd_dict = Dict("node_a" => String[], "node_b" => ["Wind2"], "node_c" => ["S
 function get_nodal_net_load(data_dict, rd_dict)
     load_data = data_dict["load_parameter"]
     rd_data = data_dict["rd_parameter"]
-    
+
     nodal_net_load = DataFrame()
     nodal_net_load[!, "DateTime"] = load_data[:, "DateTime"]
 
@@ -284,7 +284,7 @@ function get_metrics(data_dict, end_pt, sys)
     curtailment = rd_param .- rd_realized
     curt_d, curt_h, curt_h_sigma = get_avg_data(curtailment)
     curt_w = get_avg_week_data(curtailment)
-    
+
     tot_curtailment = sum(rd_param) - sum(rd_realized)
 
     metrics_dict["vre_int"] = rd_realized
@@ -354,7 +354,7 @@ function get_metrics(data_dict, end_pt, sys)
 
             flows[:] .+= fapv_abs .* bus_connections[i, j]
 
-            
+
             if bus_connections_adj[i, j] != 0
                 direction = sign(bus_connections_adj[i, j])
                 for k in 1:end_pt
@@ -369,7 +369,7 @@ function get_metrics(data_dict, end_pt, sys)
         flow_amounts[!, bus] = flows
         available_import[!, bus] = av_imp
         available_export[!, bus] = av_exp
-    end 
+    end
     flow_amounts_norm = copy(flow_amounts)
     for i in 2:6
         flow_amounts_norm[:, i] ./= bus_caps[i - 1]
@@ -479,7 +479,7 @@ function get_metrics_RTS(data_dict, end_pt, sys)
     curtailment = rd_param .- rd_realized
     curt_d, curt_h, curt_h_sigma = get_avg_data(curtailment)
     curt_w = get_avg_week_data(curtailment)
-    
+
     tot_curtailment = sum(rd_param) - sum(rd_realized)
 
     metrics_dict["curt"] = tot_curtailment
@@ -539,13 +539,13 @@ end
 
 
 function plot_data(
-    data_list, 
-    data_entry, 
+    data_list,
+    data_entry,
     iters,
-    labels; 
-    title = "", 
+    labels;
+    title = "",
     second_axis = false,
-    second_axis_data = nothing, 
+    second_axis_data = nothing,
     second_axis_iters = nothing,
     second_axis_label = nothing,
     second_axis_legend = :none,
@@ -588,8 +588,8 @@ function print_vals(metric, data_set; names = ["Bus 1: ", "Bus 2: ", "Bus 3: ", 
 end
 
 function get_scalar_metrics(
-    data_dict, 
-    end_pt = 8400; 
+    data_dict,
+    end_pt = 8400;
     interconnect_cap = [1200, 800, 800, 1040, 640],
     nnd = [2.333, 2.5, 2.5, 2.38, 3.0],
     cc = [320, 266.7, 240, 282.4, 218.2],
@@ -744,7 +744,7 @@ end
 
 lines = ["line_ab", "line_ad", "line_ae", "line_bc", "line_cd", "line_de"]
 
-data = ["FlowActivePowerVariable__Line", 
+data = ["FlowActivePowerVariable__Line",
         "FlowActivePowerVariable__TapTransformer",
         "ActivePowerTimeSeriesParameter__PowerLoad",
         "ActivePowerTimeSeriesParameter__RenewableDispatch",
@@ -770,11 +770,11 @@ data = ["FlowActivePowerVariable__Line",
         "NetworkFlowConstraint__Line",
         "NetworkFlowConstraint__TapTransformer"
 ]
-key = ["fapv", 
+key = ["fapv",
         "fapv_tt",
         "load_parameter",
         "rd_parameter",
-        "ts", 
+        "ts",
         "start_ts",
         "stop_ts",
         "on_ts",
@@ -783,9 +783,9 @@ key = ["fapv",
         "in_ems",
         "ev_ems",
         "slackup",
-        "slackdown", 
+        "slackdown",
         "pcm_ts",
-        "pcm_rd", 
+        "pcm_rd",
         "pcm_ems",
         "pcm_gb",
         "pcm_tms",
@@ -796,4 +796,3 @@ key = ["fapv",
         "dual_flow_line",
         "dual_flow_tt"
 ]
-

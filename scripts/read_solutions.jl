@@ -1,3 +1,12 @@
+#########################################################################################################
+# This script includes some functions for loading data from simulations. The template_functions.jl file
+# contains some functions for loading in solutions and for computing specific metrics (e.g., LMPS or
+# production costs). The RTS system is more complex than the 5-bus system, so this script focuses on
+# the RTS system. Some lines will need to be removed or updatedfor the 5-bus system (e.g., it doesn't
+# contain tap transformers, so lines of code referencing this can be updated or removed). At the end of
+# this file, there are some commented-out sections that facilitate visualizing the graph-based system.
+# Producing these plots requires PlasmoData, Graphs, and PlasmoDataPlots to be added to your environment
+#########################################################################################################
 using Revise
 using PowerSystems
 using PowerSimulations
@@ -23,12 +32,15 @@ sys_path = (@__DIR__)*"/../systems_data/RTS_system_PV.json"
 sys = System(sys_path)
 
 include((@__DIR__)*"/template_functions.jl")
-sol =#FILL THIS IN #get_results_dict((@__DIR__)*"/RTS_sims", "RTS_PV", data = data, key = key, sys = sys)
+sol = #FILL THIS IN #get_results_dict((@__DIR__)*"/RTS_sims", "RTS_PV", data = data, key = key, sys = sys)
+# the first argument of `get_results_dict`` is the directory where the simulation directories exist
+# the second argument is the name of the simulation directory itself, with no / needed in the filename
 
+# NOTE: for the 5bus system, there are no tap transformers, so this line can be deleted
 sol["dual_flow"] = hcat(sol["dual_flow_line"], sol["dual_flow_tt"][:, 2:end])
 
 end_pt = 8400
-metrics = get_metrics_RTS(sol, end_pt, sys = sys)
+metrics = get_metrics_RTS(sol, end_pt, sys) #NOTE: for the 5-bus system, use "get_metrics" instead of "get_metrics_RTS"
 rds = collect(get_components(RenewableDispatch, sys))
 buses = collect(get_components(Bus, sys))
 lines = collect(get_components(Line, sys))
@@ -90,7 +102,7 @@ for l in lines
     bus2 = arc.to.name
     datadf[bus_map[bus1], "int_cap"] += rating
     datadf[bus_map[bus2], "int_cap"] += rating
-    
+
     fapv_norm = sol["fapv_norm"][!, l.name]
     datadf[bus_map[bus1], "100lines"] += sum(fapv_norm .>= 1)
     datadf[bus_map[bus2], "100lines"] += sum(fapv_norm .>= 1)
@@ -111,13 +123,13 @@ for tt in tts
     bus2 = arc.to.name
     datadf[bus_map[bus1], "int_cap"] += rating
     datadf[bus_map[bus2], "int_cap"] += rating
-    
+
     fapv_norm = sol["fapv_tt_norm"][!, tt.name]
     datadf[bus_map[bus1], "100lines"] += sum(fapv_norm .>= 1)
     datadf[bus_map[bus2], "100lines"] += sum(fapv_norm .>= 1)
     push!(datadf[bus_map[bus1], "line_cons"], tt.name)
     push!(datadf[bus_map[bus2], "line_cons"], tt.name)
-    
+
     bus_idx1 = bus_map[bus1]
     bus_idx2 = bus_map[bus2]
 
@@ -226,6 +238,4 @@ plot_graph(dg, node_z = get_node_data(dg, "100lines"), nodecolor = :grays, linew
 plot_graph(dg, node_z = get_node_data(dg, "load"), nodecolor = :grays, linewidth = 3, nodesize = 10, legend = true, rev = true)
 plot_graph(dg, node_z = get_node_data(dg, "curtailment"), nodecolor = :grays, linewidth = 3, nodesize = 10, legend = true, rev = true)
 plot_graph(dg, node_z = get_node_data(dg, "netload"), nodecolor = :grays, linewidth = 3, nodesize = 10, legend = true, rev = true)
-
-
-
+=#
