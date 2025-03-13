@@ -1,8 +1,8 @@
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.9.2"
+julia_version = "1.9.3"
 manifest_format = "2.0"
-project_hash = "aabc0ed94fe52e4761d0b90257c23b823d481f46"
+project_hash = "d7d9bbbe30bd1264a53a2419a835cb57d5a763ae"
 
 [[deps.ASL_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
@@ -1092,6 +1092,12 @@ version = "1.4.2"
 git-tree-sha1 = "cd1659ba0d57b71a464a29e64dbc67cfe83d54e7"
 uuid = "76eceee3-57b5-4d4a-8e66-0e911cebbf60"
 version = "1.6.1"
+
+[[deps.Xpress]]
+deps = ["Libdl", "LinearAlgebra", "MathOptInterface", "SparseArrays"]
+git-tree-sha1 = "502f7c1142f5233137fa02e27b22d150b78a6db3"
+uuid = "9e70acf3-d6c9-5be6-b5bd-4e2c73e3e054"
+version = "0.16.1"
 
 [[deps.YAML]]
 deps = ["Base64", "Dates", "Printf", "StringEncodings"]
