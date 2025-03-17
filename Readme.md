@@ -53,7 +53,7 @@ The following Julia scripts are contained in this directory. Note that the 5-bus
  * `read_solutions.jl` - Contains code for loading solutions of a simulation and determining different metrics/descriptors for the system. Note that a simulation must first be run and saved before running this script as no simulations are stored directly in this repository.
  * `template_functions.jl` - Contains the functions called by `read_solutions.jl`.
 
-To run a given script without LDES contained in the simulation, the user can pass `false` as the third argument of the `get_template_uc` function.
+To run a given script without LDES contained in the simulation, the user can pass `false` as the third argument of the `get_template_uc` function. In addition, look-ahead horizons can be altered for any of these simulations by changing the `horizon` parameter in the scripts. 
 
 ### `packages/`
 Two of the packages in the `Project.toml` file were modified slightly from the original package versions, and these changes are captured in this directory. The StorageSystemsSimulations.jl version used for our simulations can be found in this directory and marked for development. The PowerSimulations.jl package is slightly modified, but corresponds very closely to PowerSimulations.jl version 0.19.6 (commit [4fbe86e](https://github.com/NREL-Sienna/PowerSimulations.jl/tree/4fbe86efb1a9f7fa2cc7026e3b1681e216dc472a)), and for the time horizon comparison scripts and 5-bus PV-driven case, version 0.19.6 was directly used. 
